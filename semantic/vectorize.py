@@ -1,5 +1,6 @@
 import pickle
 import os
+import time
 import definitions
 import numpy as np
 from semantic.utility import ensure_directory
@@ -16,6 +17,13 @@ def load_definition():
     return definition
 
 
+def fitting(vectorizer, **kwargs):
+    start = time.time()
+    vectorizer.fit(**kwargs)
+    duration = int((time.time() - start) / 60)
+    print('Took {} minutes'.format(duration))
+
+
 def main():
     definition = load_definition()
     for vectorizer in definition.vectorizers:
@@ -23,7 +31,7 @@ def main():
         output = os.path.join(ROOT, definition.output, name)
         ensure_directory(output)
         print('Fit', name)
-        vectorizer.fit(**definition.fit)
+        fitting(vectorizer, **definition.fit)
         with open(os.path.join(output, 'vectorizer.pkl'), 'wb') as file_:
             pickle.dump(vectorizer, file_)
         uuids, vectors = vectorizer.transform(**definition.transform)
