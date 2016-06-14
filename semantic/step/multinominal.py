@@ -1,4 +1,4 @@
-from numpy import percentile, clip, digitize, arange
+from numpy import percentile, clip, digitize, arange, count_nonzero, array
 from sklearn.preprocessing import MinMaxScaler, FunctionTransformer
 from sklearn.pipeline import Pipeline
 
@@ -28,13 +28,20 @@ class Multinominal(Step):
 
     def transform(self, vectors):
         assert self.pipeline is not None
+        probabilities = []
         vectors = self.pipeline.transform(vectors)
+        docs = self.transformed_vectors.shape[0]
+        for x in vectors:
+            count = count_nonzero((self.transformed_vectors == x).all(axis=0))
+            pr = count / docs
+            probabilities.append(pr)
+        return array(probabilities)
 
     def get_params(self):
-        pass
+        return self.pipeline, self.transformed_vectors
 
     def set_params(self, params):
-        pass
+        self.pipeline, self.transformed_vectors = params
 
 
 class Discretizer:
