@@ -10,8 +10,8 @@ ROOT = os.path.join(os.path.dirname(__file__), '..')
 
 
 def load_definition():
-    schema = os.path.join(ROOT, 'schema/vectorize.yaml')
-    definition = os.path.join(ROOT, 'definition/vectorize.yaml')
+    schema = os.path.join(ROOT, 'schema/embed.yaml')
+    definition = os.path.join(ROOT, 'definition/embed.yaml')
     definition = definitions.Parser(schema)(definition)
     definition.fit.filename = os.path.join(ROOT, definition.fit.filename)
     return definition
