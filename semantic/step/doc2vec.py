@@ -14,14 +14,16 @@ class Doc2Vec(Step):
 
     def fit(self, filename):
         self._model.build_vocab(self._read(filename))
-        # self._model.scale_vocab()
-        # self._model.finalize_vocab()
         self._model.train(self._read(filename))
-        # FIXME: print('Doc2Vec log accuracy', self._model.log_accuracy())
-        _, vectors = self.transform(filename)
+        _, vectors = self._transform(filename)
         self._ica.fit(vectors)
 
     def transform(self, filename):
+        uuids, vectors = self._transform(filename)
+        vectors = self._ica.transform(vectors)
+        return uuids, vectors
+
+    def _transform(self, filename):
         vectors = []
         uuids = []
         for uuid, tokens in Reader(filename):
@@ -32,7 +34,6 @@ class Doc2Vec(Step):
             vectors.append(vector)
             uuids.append(uuid)
         vectors = np.array(vectors)
-        vectors = self._ica.transform(vectors)
         return uuids, vectors
 
     @classmethod

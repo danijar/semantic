@@ -31,19 +31,19 @@ def training(definition, distribution, data):
         train, test = data[train], data[test]
         distribution.fit(train)
         predictions = distribution.transform(test)
-        yield -np.log(np.clip(predictions, 1e-10, 1)).sum()
+        yield -np.log(np.clip(predictions, 1e-10, 1)).mean()
 
 
 def main():
     definition = load_definition()
     data = load_data(definition)
     for distribution in definition.distributions:
-        name = type(distribution).__name__.lower()
-        output = os.path.join(ROOT, definition.output, name)
+        name = type(distribution).__name__
+        output = os.path.join(ROOT, definition.output, name.lower())
         ensure_directory(output)
         costs = np.array(list(training(definition, distribution, data)))
-        message = 'Fit {} cost mean {} stdev {}'
-        print(message.format(costs.mean(), costs.std(), name))
+        message = 'Fit {} cost mean {} std {}'
+        print(message.format(name, costs.mean(), costs.std()))
         distribution.fit(data)
         with open(os.path.join(output, 'distribution.pkl'), 'wb') as file_:
             pickle.dump(distribution, file_)

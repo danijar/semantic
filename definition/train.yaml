@@ -1,9 +1,11 @@
 data: data/hendrik.csv
-vectorizer: data/experiment-1/tfidf/vectorizer.pkl
+vectorizer: data/experiment-1/doc2vec/vectorizer.pkl
 output: data/experiment-1
 folds: 10
 distributions:
 - type: GMM
+  n_components: 5
+  # n_iter: 2
 - type: MultinomialNB
   percentile_threshold: 1
   bins: 10

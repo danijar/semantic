@@ -1,11 +1,10 @@
 output: data/experiment-1
 vectorizers:
 - type: Doc2Vec
-  size: 1000
-  iter: 10
+  size: 500
+  iter: 1  # 5
   workers: 4
   negative: 30
-  # dm_concat: 1
   ica:
     n_components: 100
 - type: TfIdf
