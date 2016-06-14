@@ -1,0 +1,17 @@
+type: dict
+mapping:
+  sources:
+    type: list
+    elements:
+      type: dict
+      mapping:
+        filename:
+          type: str
+        color:
+          type: str
+  output:
+    type: str
+  vectorizer:
+    type: str
+  reducers:
+    type: list

@@ -1,0 +1,14 @@
+sources:
+  - filename: data/hendrik-pocket.csv
+    color: red
+  - filename: data/fabian-pocket.csv
+    color: green
+output: data/experiment-1
+vectorizer: data/experiment-1/tfidf/vectorizer.pkl
+reducers:
+  - type: PCA
+    module: sklearn.decomposition
+    n_components: 50
+  - type: TSNE
+    module: sklearn.manifold
+    n_components: 2
