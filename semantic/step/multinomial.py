@@ -11,7 +11,7 @@ class Multinomial(Step):
         self.lower = percentile_threshold
         self.upper = 100 - percentile_threshold
         scaler = MinMaxScaler()
-        discretizer = FunctionTransformer(Discretizer(self.bins))
+        discretizer = FunctionTransformer(Discretizer(bins))
         self.pipeline = Pipeline([('scaler', scaler),
                                   ('discretizer', discretizer)])
 

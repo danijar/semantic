@@ -41,7 +41,7 @@ def main():
         name = type(distribution).__name__.lower()
         output = os.path.join(ROOT, definition.output, name)
         ensure_directory(output)
-        costs = np.array(training(distribution, data))
+        costs = np.array(list(training(definition, distribution, data)))
         message = 'Fit {} cost mean {} variance {}'
         print(message.format(costs.mean(), costs.std(), name))
         distribution.fit(data)

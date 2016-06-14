@@ -17,4 +17,4 @@ class TfIdf(Step):
         article_tokens = Reader(filename)
         uuids, contents = zip(*[(uuid, ' '.join(tokens)) for uuid, tokens in article_tokens])
         tf_idfs = self.vectorizer.transform(contents)
-        return uuids, tf_idfs
+        return uuids, tf_idfs.toarray()
