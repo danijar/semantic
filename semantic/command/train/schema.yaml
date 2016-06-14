@@ -1,0 +1,15 @@
+type: dict
+mapping:
+  data:
+    type: str
+  vectorizer:
+    type: str
+  output:
+    type: str
+  folds:
+    type: int
+  distributions:
+    type: list
+    elements:
+      type: Step
+      module: semantic.step

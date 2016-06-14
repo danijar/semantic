@@ -1,3 +1,4 @@
+import pickle
 import os
 import definitions
 import numpy as np
@@ -15,7 +16,8 @@ def main():
             root, definition.output, type(vectorizer).__name__.lower())
         ensure_directory(output)
         vectorizer.fit(**definition.fit)
-        vectorizer.save(os.path.join(output, 'params.pkl'))
+        with open(os.path.join(output, 'vectorizer.pkl'), 'wb') as file_:
+            pickel.dump(vectorizer, file_)
         uuids, vectors = vectorizer.transform(**definition.transform)
         np.save(os.path.join(output, 'uuids.npy'), uuids)
         np.save(os.path.join(output, 'vectors.npy'), vectors)
