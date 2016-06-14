@@ -1,4 +1,6 @@
 from abc import ABCMeta, abstractmethod
+import os
+import pickle
 
 
 class Step(metaclass=ABCMeta):
@@ -20,7 +22,15 @@ class Step(metaclass=ABCMeta):
         raise NotImplementedError
 
     def save(self, filename):
-        pass
+        filepath = os.path.join(self._cache_dir, filename)
+        with open(filepath, 'w') as file_:
+            pickle.dump(file_, self.get_params())
 
     def load(self, filename):
-        pass
+        filepath = os.path.join(self._cache_dir, filename)
+        with open(filepath) as file_:
+            self.set_params(pickle.load(file_))
+
+    @staticmethod
+    def _cache_dir(self):
+        return os.path.join(os.path.dirname(__file__), '../../cache')
