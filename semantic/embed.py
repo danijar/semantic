@@ -18,25 +18,29 @@ def load_definition():
 
 
 def fitting(vectorizer, **kwargs):
+    print('Fit', type(vectorizer).__name__)
     start = time.time()
     vectorizer.fit(**kwargs)
     duration = int((time.time() - start) / 60)
     print('Took {} minutes'.format(duration))
 
 
+def store(vectorizer, output, **kwargs):
+    ensure_directory(output)
+    with open(os.path.join(output, 'vectorizer.pkl'), 'wb') as file_:
+        pickle.dump(vectorizer, file_)
+    uuids, vectors = vectorizer.transform(**kwargs)
+    np.save(os.path.join(output, 'uuids.npy'), uuids)
+    np.save(os.path.join(output, 'vectors.npy'), vectors)
+
+
 def main():
     definition = load_definition()
     for vectorizer in definition.vectorizers:
         name = type(vectorizer).__name__.lower()
-        output = os.path.join(ROOT, definition.output, name)
-        ensure_directory(output)
-        print('Fit', name)
         fitting(vectorizer, **definition.fit)
-        with open(os.path.join(output, 'vectorizer.pkl'), 'wb') as file_:
-            pickle.dump(vectorizer, file_)
-        uuids, vectors = vectorizer.transform(**definition.transform)
-        np.save(os.path.join(output, 'uuids.npy'), uuids)
-        np.save(os.path.join(output, 'vectors.npy'), vectors)
+        output = os.path.join(ROOT, definition.output, name)
+        store(vectorizer, output, **definition.transform)
 
 
 if __name__ == '__main__':
