@@ -7,7 +7,7 @@ from semantic.step import Step
 
 class Multinomial(Step):
 
-    def __init__(self, percentile_threshold=1, bins=100):
+    def __init__(self, percentile_threshold, bins):
         self.lower = percentile_threshold
         self.upper = 100 - percentile_threshold
         scaler = MinMaxScaler()
@@ -22,7 +22,7 @@ class Multinomial(Step):
         self.transformed_vectors = self.pipeline.fit_transform(vectors)
 
     def transform(self, vectors):
-        assert self.transformed_vectors
+        assert self.transformed_vectors is not None
         vectors = clip(vectors, self.lower_clip, self.upper_clip)
         probabilities = []
         vectors = self.pipeline.transform(vectors)

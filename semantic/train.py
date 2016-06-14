@@ -31,7 +31,7 @@ def training(definition, distribution, data):
         train, test = data[train], data[test]
         distribution.fit(train)
         predictions = distribution.transform(test)
-        yield -np.log(predictions).sum()
+        yield -np.log(np.clip(predictions, 1e-10, 1)).sum()
 
 
 def main():
@@ -42,7 +42,7 @@ def main():
         output = os.path.join(ROOT, definition.output, name)
         ensure_directory(output)
         costs = np.array(list(training(definition, distribution, data)))
-        message = 'Fit {} cost mean {} variance {}'
+        message = 'Fit {} cost mean {} stdev {}'
         print(message.format(costs.mean(), costs.std(), name))
         distribution.fit(data)
         with open(os.path.join(output, 'distribution.pkl'), 'wb') as file_:

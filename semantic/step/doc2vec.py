@@ -1,4 +1,5 @@
 import multiprocessing
+import numpy as np
 import gensim
 from gensim.models.doc2vec import TaggedDocument
 from semantic.parser import Reader
@@ -30,7 +31,7 @@ class Doc2Vec(Step):
                 vector = self._model.infer_vector(tokens)
             vectors.append(vector)
             uuids.append(uuid)
-        return uuids, vectors
+        return uuids, np.array(vectors)
 
     @classmethod
     def _read(cls, filename):
