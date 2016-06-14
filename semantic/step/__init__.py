@@ -4,5 +4,4 @@ from .tfidf import TfIdf
 from .gmm import GMM
 from .multinomial import Multinomial
 from .ica import ICA
-from .pca import PCA
 from .tsne import TSNE

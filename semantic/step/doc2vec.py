@@ -32,12 +32,6 @@ class Doc2Vec(Step):
             uuids.append(uuid)
         return uuids, vectors
 
-    def get_params(self):
-        return self._model
-
-    def set_params(self, params):
-        self._model = params
-
     @classmethod
     def _read(cls, filename):
         for uuid, tokens in Reader(filename):
