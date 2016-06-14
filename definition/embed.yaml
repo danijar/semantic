@@ -1,13 +1,13 @@
 output: data/experiment-1
 vectorizers:
 - type: Doc2Vec
-  size: 300
-  iter: 5  # 5
+  size: 1000
+  iter: 5
 - type: TfIdf
   stop_words: english
   min_df: 10
   max_df: 0.3
-  pca:
+  svd:
     n_components: 50
 fit:
   filename: data/corpus.csv
