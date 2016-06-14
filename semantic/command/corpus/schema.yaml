@@ -1,0 +1,15 @@
+type: dict
+mapping:
+  output:
+    type: str
+  vectorizers:
+    type: list
+    elements:
+      type: Step
+      module: semantic.step
+  fit:
+    filename:
+      type: str
+  transform:
+    filename:
+      type: str

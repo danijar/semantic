@@ -1,0 +1,10 @@
+output: experiment-1
+vectorizers:
+- type: Doc2Vec
+  dimensions: 300
+- type: Tfidf
+  min_occurances: 3
+fit:
+  filepath: corpus.yaml
+transform:
+  filepath: corpus.yaml

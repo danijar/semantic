@@ -1,0 +1,12 @@
+type: list
+elements:
+  type: dict
+  mapping:
+    uuid:
+      type: str
+    content:
+      type: str
+    title:
+      type: str
+    url:
+      type: str
