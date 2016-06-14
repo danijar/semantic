@@ -28,7 +28,7 @@ class Multinomial(Step):
         vectors = self.pipeline.transform(vectors)
         docs = self.transformed_vectors.shape[0]
         for x in vectors:
-            count = count_nonzero((self.transformed_vectors == x).all(axis=0))
+            count = count_nonzero((self.transformed_vectors == x).all(axis=1))
             pr = count / docs
             probabilities.append(pr)
         return array(probabilities)
