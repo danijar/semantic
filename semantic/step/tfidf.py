@@ -10,12 +10,14 @@ class TfIdf(Step):
 
     def fit(self, filename):
         article_tokens = Reader(filename)
-        article_contents = [''.join(tokens) for uuid, tokens in article_tokens]
+        article_contents = [' '.join(tokens) for uuid, tokens in article_tokens]
+        print(type(article_contents), len(article_contents))
         self._vectorizer.fit(article_contents)
 
     def transform(self, filename):
         article_tokens = Reader(filename)
-        uuids, contents = zip(*[(uuid, ''.join(tokens)) for uuid, tokens in article_tokens])
+        uuids, contents = zip(*[(uuid, ' '.join(tokens)) for uuid, tokens in article_tokens])
+        print(type(contents), len(contents))
         tf_idfs = self._vectorizer.transform(contents)
         return uuids, tf_idfs
 
