@@ -16,7 +16,7 @@ class Multinomial(Step):
         self.pipeline = None
         self.transformed_vectors = None
 
-    def fit(self, vectors, percentile_threshold=1):
+    def fit(self, vectors):
         self.lower_clip = percentile(vectors, self.lower, axis=0)
         self.upper_clip = percentile(vectors, self.upper, axis=0)
         vectors = clip(vectors, self.lower_clip, self.upper_clip)
