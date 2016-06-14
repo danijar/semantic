@@ -9,13 +9,13 @@ class TfIdf(Step):
         self._vectorizer = TfidfVectorizer(**kwargs)
 
     def fit(self, filename):
-        articles = Reader(filename)
-        articles = [''.join(x.tokens) for x in articles]
-        self._vectorizer.fit(articles)
+        article_tokens = Reader(filename)
+        article_contents = [''.join(tokens) for uuid, tokens in article_tokens]
+        self._vectorizer.fit(article_contents)
 
     def transform(self, filename):
-        articles = Reader(filename)
-        uuids, contents = zip(*[(a.uuid, ''.join(a.tokens)) for a in articles])
+        article_tokens = Reader(filename)
+        uuids, contents = zip(*[(uuid, ''.join(tokens)) for uuid, tokens in article_tokens])
         tf_idfs = self._vectorizer.transform(contents)
         return uuids, tf_idfs
 
