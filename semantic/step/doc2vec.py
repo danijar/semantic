@@ -1,4 +1,5 @@
 import re
+import os
 import multiprocessing
 import gensim
 import definitions
@@ -11,15 +12,15 @@ class Doc2Vec(Step):
     def __init__(self, dimensions=300, iterations=5, **kwargs):
         self._dimensions = dimensions
         self._iterations = iterations
+        self._arguments = kwargs
         self._workers = multiprocessing.cpu_count()
-        self._keywords = kwargs
 
     def fit(self, filename):
         self.model = gensim.model.Doc2Vec(
             size=self._dimensions,
             iter=self._iterations,
             workers=self._workers,
-            **self._keywords
+            **self._arguments
         )
         self.model.build_vocab(self._read(filename))
         self.model.train(self._read(filename))
