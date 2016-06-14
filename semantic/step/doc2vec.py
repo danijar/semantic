@@ -1,9 +1,9 @@
 import re
 import multiprocessing
 import gensim
+import definitions
 from gensim.models.doc2vec import TaggedDocument
 from semantic.step import Step
-from semantic.parser import Reader
 
 
 class Doc2Vec(Step):
@@ -54,7 +54,8 @@ class Doc2Vec(Step):
 
     @classmethod
     def _read(cls, filename):
-        reader = Reader(filename)
-        for document in reader:
+        schema = os.path.join(os.path.dirname(__file__), '../documents.yaml')
+        parser = definitions.Parser(schema)
+        for document in parser(filename):
             tokens = cls._tokenize(document.content)
             yield TaggedDocument(tokens, [document.uuid])
