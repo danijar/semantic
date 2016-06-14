@@ -6,11 +6,11 @@ from sklearn.cross_validation import KFold
 from semantic.utility import ensure_directory
 
 
-ROOT = os.path.join(os.path.dirname(__file__), '../../..')
+ROOT = os.path.join(os.path.dirname(__file__), '..')
 
 
 def load_definition():
-    schema = os.path.join(os.path.dirname(__file__), 'schema.yaml')
+    schema = os.path.join(ROOT, 'schema/train.yaml')
     definition = os.path.join(ROOT, 'definition/train.yaml')
     definition = definitions.Parser(schema)(definition)
     definition.data = os.path.join(ROOT, definition.data)

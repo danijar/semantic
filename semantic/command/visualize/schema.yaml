@@ -1,8 +1,0 @@
-type: dict
-mapping:
-  data:
-    type: str
-  vectorizer:
-    type: str
-  output:
-    type: str

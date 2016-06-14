@@ -5,12 +5,12 @@ import numpy as np
 from semantic.utility import ensure_directory
 
 
-ROOT = os.path.join(os.path.dirname(__file__), '../../../')
+ROOT = os.path.join(os.path.dirname(__file__), '..')
 
 
 def load_definition():
-    schema = os.path.join(os.path.dirname(__file__), 'schema.yaml')
-    definition = os.path.join(ROOT, 'definition/corpus.yaml')
+    schema = os.path.join(ROOT, 'schema/vectorize.yaml')
+    definition = os.path.join(ROOT, 'definition/vectorize.yaml')
     definition = definitions.Parser(schema)(definition)
     definition.fit.filename = os.path.join(ROOT, definition.fit.filename)
     return definition
