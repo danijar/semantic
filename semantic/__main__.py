@@ -1,19 +1,14 @@
 import argparse
-from semantic import command
+import importlib
 
 
 def main():
-    commands = {
-        'corpus': command.corpus,
-        'train': command.train,
-        'test': command.test,
-        'visualize': command.visualize,
-        'recommend': command.recommend,
-    }
+    commands = ['corpus', 'train', 'test', 'visualize', 'recommend']
     parser = argparse.ArgumentParser()
-    parser.add_argument('command', choice=list(commands.keys()))
+    parser.add_argument('command', choices=commands)
     args = parser.parse_args()
-    import args.command.__main__
+    command = 'semantic.command.{}.__main__'.format(args.command)
+    importlib.import_module(command).main()
 
 
 if __name__ == '__main__':

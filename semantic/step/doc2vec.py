@@ -1,4 +1,3 @@
-import re
 import multiprocessing
 import gensim
 from gensim.models.doc2vec import TaggedDocument
@@ -8,22 +7,16 @@ from semantic.step import Step
 
 class Doc2Vec(Step):
 
-    def __init__(self, dimensions=300, iterations=5, **kwargs):
-        self._dimensions = dimensions
-        self._iterations = iterations
-        self._arguments = kwargs
-        self._workers = multiprocessing.cpu_count()
+    def __init__(self, **kwargs):
+        self._kwargs = kwargs
+        self._model = gensim.models.Doc2Vec(
+            workers=multiprocessing.cpu_count(),
+            **kwargs)
 
     def fit(self, filename):
-        self.model = gensim.model.Doc2Vec(
-            size=self._dimensions,
-            iter=self._iterations,
-            workers=self._workers,
-            **self._arguments
-        )
-        self.model.build_vocab(self._read(filename))
-        self.model.train(self._read(filename))
-        return self.model
+        self._model.build_vocab(self._read(filename))
+        self._model.train(self._read(filename))
+        return self._model
 
     def transform(self, filename):
         assert self.model
@@ -37,23 +30,15 @@ class Doc2Vec(Step):
                 vector = self.model.infer_vector(tokens)
             vectors.append(vector)
             uuids.append(uuid)
-        return vectors, uuids
+        return uuids, vectors
 
     def get_params(self):
-        return self.model
+        return self._model
 
     def set_params(self, params):
-        self.model = params
-
-    @classmethod
-    def _tokenize(cls, text):
-        TOKEN_REGEX = re.compile(r'[A-Za-z]+|[0-9]+|[,.!?:]')
-        tokens = re.findall(TOKEN_REGEX, text)
-        tokens = [x.lower() for x in tokens]
-        return tokens
+        self._model = params
 
     @classmethod
     def _read(cls, filename):
-        for document in Reader(filename):
-            tokens = cls._tokenize(document.content)
-            yield TaggedDocument(tokens, [document.uuid])
+        for uuid, tokens in Reader(filename):
+            yield TaggedDocument(tokens, [uuid])

@@ -1,10 +1,13 @@
 output: data/experiment-1
 vectorizers:
 - type: Doc2Vec
-  dimensions: 300
-- type: Tfidf
-  min_occurances: 3
+  size: 300
+  iter: 5
+- type: TfIdf
+  stop_words: english
+  min_df: 0.05
+  max_df: 0.15
 fit:
-  filepath: corpus.yaml
+  filename: data/corpus.csv
 transform:
-  filepath: corpus.yaml
+  filename: data/corpus.csv

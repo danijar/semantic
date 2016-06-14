@@ -5,7 +5,7 @@ from sklearn.pipeline import Pipeline
 from semantic.step import Step
 
 
-class Multinominal(Step):
+class Multinomial(Step):
 
     def __init__(self, percentile_threshold=1, bins=100):
         self.lower = percentile_threshold

@@ -7,10 +7,10 @@ class Reader:
     TOKEN_REGEX = re.compile(r'[A-Za-z]+|[0-9]+|[,.!?:]')
 
     def __init__(self, filename):
-        self.filename = filename
+        self._filename = filename
 
     def __iter__(self):
-        with open(self.filename, 'r') as f:
+        with open(self._filename, 'r') as f:
             reader = csv.reader(f, delimiter=',')
             next(reader)
             for article in reader:
