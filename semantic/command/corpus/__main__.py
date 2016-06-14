@@ -10,7 +10,7 @@ def main():
         os.path.dirname(__file__), '../../../definition/corpus.yaml')
     definition = definitions.Parser(schema)(definition)
     output = os.path.join(
-        os.path.dirname(__file__), '../../../cache', definition.output)
+        os.path.dirname(__file__), '../../..', definition.output)
     ensure_directory(output)
     for vectorizer in definition.vectorizers:
         directory = os.path.join(output, type(vectorizer).__name__.lower())
