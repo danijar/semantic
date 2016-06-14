@@ -15,8 +15,14 @@ class Reader:
             next(reader)
             for article in reader:
                 title, url, content, authors, image, error, uuid = article
-                if not uuid or len(uuid) == 0:
+
+                try:
+                    assert uuid
+                    assert len(uuid) > 0
+                    assert len(content) > 100
+                except AssertionError:
                     continue
+
                 tokens = self._tokenize(content)
                 yield uuid, tokens
 
