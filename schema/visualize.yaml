@@ -13,5 +13,7 @@ mapping:
     type: str
   vectorizer:
     type: str
-  reducers:
-    type: list
+  pca:
+    type: dict
+  tsne:
+    type: dict

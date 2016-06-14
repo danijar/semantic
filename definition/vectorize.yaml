@@ -1,8 +1,8 @@
 output: data/experiment-1
 vectorizers:
-  # - type: Doc2Vec
-  #   size: 300
-  #   iter: 1  # 5
+- type: Doc2Vec
+  size: 300
+  iter: 5  # 5
 - type: TfIdf
   stop_words: english
   min_df: 10

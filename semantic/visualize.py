@@ -1,8 +1,11 @@
 import pickle
 import os
 import definitions
+from definitions.attrdict import AttrDict
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.decomposition import KernelPCA
+from sklearn.manifold import TSNE
 from semantic.utility import ensure_directory
 
 
@@ -14,26 +17,29 @@ def load_definition():
     definition = os.path.join(ROOT, 'definition/visualize.yaml')
     definition = definitions.Parser(schema)(definition)
     definition.output = os.path.join(ROOT, definition.output)
-    for source in definition.source:
+    for index, source in enumerate(definition.sources):
+        source = AttrDict(source)
         source.filename = os.path.join(ROOT, source.filename)
+        definition.sources[index] = source
     return definition
 
 
 def load_data(definition):
     with open(os.path.join(ROOT, definition.vectorizer), 'rb') as file_:
         vectorizer = pickle.load(file_)
-    vectors, colors = [], []
+    data, colors = [], []
     for source in definition.sources:
         _, vectors = vectorizer.transform(source.filename)
-        vectors.append(vectors)
+        data.append(vectors)
         colors.append(source.color)
-    return vectors, colors
+    return data, colors
 
 
 def plot_vectors(data, colors, labels, output):
     fig, ax = plt.subplots(figsize=(12, 8))
     for points, label, color in zip(data, labels, colors):
-        ax.scatter(points, label=label, c=color)
+        print(points)
+        ax.scatter(points[:, 0], points[:, 1], label=label, c=color)
     ax.legend(loc='upper right')
     ensure_directory(output)
     filename = os.path.join(output, 'figure.png')
@@ -44,14 +50,26 @@ def main():
     definition = load_definition()
     data, colors = load_data(definition)
     lengths = [len(x) for x in data]
+    print(lengths)
+
+    pca = KernelPCA(**definition.pca)
+    tsne = TSNE(**definition.tsne)
     combined = np.concatenate(data, axis=0)
-    for reducer in definition.reducers:
-        combined = reducer.fit_transform(combined)
+    print(1)
+    print(combined.shape)
+    combined = pca.fit_transform(combined)
+    print(2)
+    print(combined.shape)
+    combined = tsne.fit_transform(combined)
+    print(3)
+    print(combined.shape)
+
+    data = []
     for index, length in enumerate(lengths):
-        start = sum(lengths[:index])
-        end = start + length
-        data[start: end] = combined[start: end]
-    labels = [os.path.basename(x).split('.')[0] for x in definition.sources]
+        index = sum(lengths[:index])
+        data.append(combined[index: index + length])
+    labels = [os.path.basename(x.filename).split('.')[0]
+              for x in definition.sources]
     plot_vectors(data, labels, colors, definition.output)
 
 
