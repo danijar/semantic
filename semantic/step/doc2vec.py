@@ -19,15 +19,15 @@ class Doc2Vec(Step):
         return self._model
 
     def transform(self, filename):
-        assert self.model
+        assert self._model
         vectors = []
         uuids = []
         for tokens, uuid in self._read(filename):
             uuid = uuid[0]
-            if uuid in self.model.docvecs:
-                vector = self.model.docvecs[uuid]
+            if uuid in self._model.docvecs:
+                vector = self._model.docvecs[uuid]
             else:
-                vector = self.model.infer_vector(tokens)
+                vector = self._model.infer_vector(tokens)
             vectors.append(vector)
             uuids.append(uuid)
         return uuids, vectors
