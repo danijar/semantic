@@ -1,0 +1,9 @@
+data: data/hendrik.csv
+vectorizer: data/experiment-1/tfidf/vectorizer.pkl
+output: data/experiment-1
+folds: 10
+distributions:
+- type: GMM
+- type: Multinomial
+  percentile_threshold: 1
+  bins: 100
