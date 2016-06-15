@@ -1,4 +1,4 @@
-data: data/hendrik.csv
+data: data/hendrik-pocket.csv
 vectorizer: data/experiment-1/doc2vec/vectorizer.pkl
 output: data/experiment-1
 folds: 10

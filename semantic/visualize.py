@@ -35,10 +35,9 @@ def load_data(definition):
     return data, colors
 
 
-def plot_vectors(data, colors, labels, output):
+def plot_vectors(data, labels, colors, output):
     fig, ax = plt.subplots(figsize=(12, 8))
     for points, label, color in zip(data, labels, colors):
-        print(points)
         ax.scatter(points[:, 0], points[:, 1], label=label, c=color)
     ax.legend(loc='upper right')
     ensure_directory(output)
@@ -50,19 +49,12 @@ def main():
     definition = load_definition()
     data, colors = load_data(definition)
     lengths = [len(x) for x in data]
-    print(lengths)
 
     pca = KernelPCA(**definition.pca)
     tsne = TSNE(**definition.tsne)
     combined = np.concatenate(data, axis=0)
-    print(1)
-    print(combined.shape)
     combined = pca.fit_transform(combined)
-    print(2)
-    print(combined.shape)
     combined = tsne.fit_transform(combined)
-    print(3)
-    print(combined.shape)
 
     data = []
     for index, length in enumerate(lengths):
