@@ -1,15 +1,15 @@
 output: data/experiment-2
-data: data/fabian.csv
+data: data/hendrik.csv
 vectorizers:
   - data/experiment-1/tfidf.pkl
   - data/experiment-1/doc2vec.pkl
 folds: 10
 distributions:
   - type: GMM
-    n_components: 5
+    n_components: 20
     covariance_type: full
-  - type: MultinomialNB
-    percentile_threshold: 0  # 1
-    bins: 5
-  # - type: NearestNeighbors
-  #   neighbors: 10
+  - type: MultinomialAVG
+    percentile_threshold: 0
+    bins: 20
+  - type: NearestNeighbors
+    neighbors: 10
