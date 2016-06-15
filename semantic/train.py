@@ -34,7 +34,7 @@ def training(distribution, data, folds):
     for train, test in folds:
         train, test = data[train], data[test]
         distribution.fit(train)
-        yield distribution.transform(test)
+        yield distribution.transform(test).mean()
 
 
 def store_distribution(distribution, vectorizer, name, output):

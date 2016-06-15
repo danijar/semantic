@@ -68,9 +68,10 @@ class MultinomialAVG(Step):
         vectors = np.clip(vectors, self.lower_clip, self.upper_clip)
         probabilities = []
         n_dim = vectors.shape[1]
+        dp = self.distribution.shape[1] ** (n_dim - 1)
         vectors = self.pipeline.transform(vectors)
         for bins in vectors:
-            pr = (self.distribution[np.arange(n_dim), bins]).mean() / len(bins)
+            pr = (self.distribution[np.arange(n_dim), bins]).mean() / dp
             probabilities.append(pr)
         return -np.log(np.maximum(1e-10, np.array(probabilities)))
 
