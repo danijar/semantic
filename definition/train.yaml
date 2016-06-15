@@ -3,16 +3,13 @@ data: data/hendrik.csv
 vectorizers:
   - data/experiment-1/tfidf.pkl
   - data/experiment-1/doc2vec.pkl
-folds: 5
+folds: 10
 distributions:
   - type: GMM
-    n_components: 5
+    n_components: 10
     covariance_type: full
-    # n_iter: 500
-    # verbose: 1
   - type: MultinomialNB
-    percentile_threshold: 0
-    bins: 5
-placements:
-  - type: CoSim
-    n_nearest: 10
+    percentile_threshold: 1
+    bins: 10
+  - type: NearestNeighbors
+    neighbors: 10

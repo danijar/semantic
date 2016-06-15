@@ -15,8 +15,8 @@ class MultinomialNB(Step):
         self.upper = 100 - percentile_threshold
         scaler = MinMaxScaler()
         discretizer = FunctionTransformer(Discretizer(self.bins))
-        self.pipeline = Pipeline([('scaler', scaler),
-                                  ('discretizer', discretizer)])
+        self.pipeline = Pipeline(
+            [('scaler', scaler), ('discretizer', discretizer)])
 
     def fit(self, vectors):
         self.lower_clip = np.percentile(vectors, self.lower, axis=0)
@@ -25,8 +25,8 @@ class MultinomialNB(Step):
         vectors = self.pipeline.fit_transform(vectors)
         n_docs = vectors.shape[0]
         self.distribution = np.array(
-                [np.bincount(v, minlength=len(self.bins))/n_docs
-                 for v in vectors.T])
+            [np.bincount(v, minlength=len(self.bins)) / n_docs
+             for v in vectors.T])
 
     def transform(self, vectors):
         assert self.distribution is not None
@@ -37,7 +37,7 @@ class MultinomialNB(Step):
         for bins in vectors:
             pr = (self.distribution[np.arange(n_dim), bins]).mean() / len(bins)
             probabilities.append(pr)
-        return np.array(probabilities)
+        return -np.log(np.array(probabilities))
 
 
 class MultinomialDEP(Step):
@@ -47,8 +47,8 @@ class MultinomialDEP(Step):
         self.upper = 100 - percentile_threshold
         scaler = MinMaxScaler()
         discretizer = FunctionTransformer(Discretizer(bins))
-        self.pipeline = Pipeline([('scaler', scaler),
-                                  ('discretizer', discretizer)])
+        self.pipeline = Pipeline(
+            [('scaler', scaler), ('discretizer', discretizer)])
 
     def fit(self, vectors):
         self.lower_clip = np.percentile(vectors, self.lower, axis=0)
@@ -63,15 +63,16 @@ class MultinomialDEP(Step):
         vectors = self.pipeline.transform(vectors)
         docs = self.transformed_vectors.shape[0]
         for x in vectors:
-            count = np.count_nonzero((self.transformed_vectors == x).all(axis=1))
+            count = np.count_nonzero(
+                (self.transformed_vectors == x).all(axis=1))
             pr = count / docs
             probabilities.append(pr)
-        return np.array(probabilities)
+        return -np.log(np.array(probabilities))
 
 
 class Discretizer:
     def __init__(self, bins):
-        self.bins = bins
+        self._bins = bins
 
     def __call__(self, X):
-        return np.digitize(X, bins=self.bins)
+        return np.digitize(X, bins=self._bins)
