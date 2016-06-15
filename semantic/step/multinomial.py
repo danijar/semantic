@@ -35,7 +35,7 @@ class MultinomialNB(Step):
         n_dim = vectors.shape[1]
         vectors = self.pipeline.transform(vectors)
         for bins in vectors:
-            pr = np.product(self.distribution[np.arange(n_dim), bins])
+            pr = (self.distribution[np.arange(n_dim), bins]).mean()
             probabilities.append(pr)
         return np.array(probabilities)
 
