@@ -13,4 +13,4 @@ class GMM(Step):
         self.gmm.fit(vectors)
 
     def transform(self, vectors):
-        return np.max(self.gmm.predict_proba(vectors), axis=1)
+        return self.gmm.score(vectors)
