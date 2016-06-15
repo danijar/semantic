@@ -2,8 +2,10 @@ type: dict
 mapping:
   data:
     type: str
-  vectorizer:
-    type: str
+  vectorizers:
+    type: list
+    elements:
+      type: str
   output:
     type: str
   folds:

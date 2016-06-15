@@ -1,16 +1,16 @@
 from sklearn.mixture import GMM as SkGMM
-import numpy as np
-
 from semantic.step import Step
 
 
 class GMM(Step):
 
     def __init__(self, **kwargs):
-        self.gmm = SkGMM(**kwargs)
+        self._model = SkGMM(**kwargs)
 
     def fit(self, vectors):
-        self.gmm.fit(vectors)
+        self._model.fit(vectors)
+        message = '  GMM aic score {} (lower means better fit)'
+        print(message.format(self._model.aic(vectors)))
 
     def transform(self, vectors):
-        return self.gmm.score(vectors)
+        return self._model.score(vectors)

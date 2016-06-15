@@ -1,3 +1,4 @@
+import itertools
 import pickle
 import os
 import definitions
@@ -17,11 +18,14 @@ def load_definition():
     return definition
 
 
-def load_data(definition):
-    with open(os.path.join(ROOT, definition.vectorizer), 'rb') as file_:
-        vectorizer = pickle.load(file_)
-    _, vectors = vectorizer.transform(definition.data)
-    return vectors
+def load_sources(definition):
+    for filepath in definition.vectorizers:
+        print('Load vectorizer', filepath)
+        with open(os.path.join(ROOT, filepath), 'rb') as file_:
+            vectorizer = pickle.load(file_)
+        _, data = vectorizer.transform(definition.data)
+        name = '.'.join(os.path.basename(filepath).split('.')[:-1])
+        yield name, data
 
 
 def training(definition, distribution, data):
@@ -30,23 +34,31 @@ def training(definition, distribution, data):
     for train, test in folds:
         train, test = data[train], data[test]
         distribution.fit(train)
-        predictions = distribution.transform(test)
-        yield -np.log(np.clip(predictions, 1e-10, 1)).mean()
+        log_density = distribution.transform(test)
+        yield -np.log(np.clip(log_density, 1e-10, 1)).mean()
+
+
+def store_distribution(distribution, vectorizer, name, output):
+        output = os.path.join(ROOT, output)
+        ensure_directory(output)
+        filename = '{}-{}.pkl'.format(vectorizer.lower(), name.lower())
+        with open(os.path.join(output, filename), 'wb') as file_:
+            pickle.dump(distribution, file_)
 
 
 def main():
     definition = load_definition()
-    data = load_data(definition)
-    for distribution in definition.distributions:
+    sources = load_sources(definition)
+    combinations = itertools.product(sources, definition.distributions)
+    for (vectorizer, data), distribution in combinations:
         name = type(distribution).__name__
-        output = os.path.join(ROOT, definition.output, name.lower())
-        ensure_directory(output)
-        costs = np.array(list(training(definition, distribution, data)))
-        message = 'Fit {} cost mean {} std {}'
-        print(message.format(name, costs.mean(), costs.std()))
+        print('Fit {} with {}'.format(vectorizer, name))
+        log_densities = np.array(list(training(definition, distribution, data)))
+        message = 'Log density mean {} std {} on test data'
+        print(message.format(log_densities.mean(), log_densities.std()))
+        print('(For mean higher is better, for std lower is better)')
         distribution.fit(data)
-        with open(os.path.join(output, 'distribution.pkl'), 'wb') as file_:
-            pickle.dump(distribution, file_)
+        store_distribution(distribution, vectorizer, name, definition.output)
 
 
 if __name__ == '__main__':

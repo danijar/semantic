@@ -26,21 +26,21 @@ def fitting(vectorizer, **kwargs):
 
 
 def store(vectorizer, output, **kwargs):
+    output = os.path.join(ROOT, output)
     ensure_directory(output)
-    with open(os.path.join(output, 'vectorizer.pkl'), 'wb') as file_:
+    name = type(vectorizer).__name__.lower()
+    with open(os.path.join(output, '{}.pkl'.format(name)), 'wb') as file_:
         pickle.dump(vectorizer, file_)
-    uuids, vectors = vectorizer.transform(**kwargs)
-    np.save(os.path.join(output, 'uuids.npy'), uuids)
-    np.save(os.path.join(output, 'vectors.npy'), vectors)
+    uuids, data = vectorizer.transform(**kwargs)
+    np.save(os.path.join(output, '{}-uuids.npy'.format(name)), uuids)
+    np.save(os.path.join(output, '{}-data.npy'.format(name)), data)
 
 
 def main():
     definition = load_definition()
     for vectorizer in definition.vectorizers:
-        name = type(vectorizer).__name__.lower()
         fitting(vectorizer, **definition.fit)
-        output = os.path.join(ROOT, definition.output, name)
-        store(vectorizer, output, **definition.transform)
+        store(vectorizer, definition.output, **definition.transform)
 
 
 if __name__ == '__main__':
