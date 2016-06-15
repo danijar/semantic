@@ -37,7 +37,7 @@ class MultinomialNB(Step):
         for bins in vectors:
             pr = (self.distribution[np.arange(n_dim), bins]).mean() / len(bins)
             probabilities.append(pr)
-        return -np.log(np.array(probabilities))
+        return -np.log(np.maximum(1e-10, np.array(probabilities)))
 
 
 class MultinomialDEP(Step):
@@ -67,7 +67,7 @@ class MultinomialDEP(Step):
                 (self.transformed_vectors == x).all(axis=1))
             pr = count / docs
             probabilities.append(pr)
-        return -np.log(np.array(probabilities))
+        return -np.log(np.maximum(1e-10, np.array(probabilities)))
 
 
 class Discretizer:

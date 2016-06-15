@@ -53,7 +53,8 @@ def main():
         name = type(distribution).__name__
         print('Fit {} with {}'.format(vectorizer, name))
         cost = np.array(list(training(distribution, data, definition.folds)))
-        print('Cost on test mean {} std {}'.format(cost.mean(), cost.std()))
+        message = 'Cost on test mean {:6.2f} std {:6.4f}'
+        print(message.format(cost.mean(), cost.std()))
         distribution.fit(data)
         store_distribution(distribution, vectorizer, name, definition.output)
 
