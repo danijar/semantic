@@ -15,3 +15,8 @@ mapping:
     elements:
       type: Step
       module: semantic.step
+  placements:
+    type: list
+    elements:
+      type: Step
+      module: semantic.step

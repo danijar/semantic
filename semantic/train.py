@@ -39,6 +39,16 @@ def training(distribution, data, folds):
         yield np.log(np.max(log_density, 1e-10)).mean()
 
 
+def embedding(measure, data, folds):
+    folds = KFold(
+        data.shape[0], n_folds=folds, shuffle=True, random_state=0)
+    for train, test in folds:
+        train, test = data[train], data[test]
+        measure.fit(train)
+        distances = measure.transform(test)
+        yield np.square(distances).sum()
+
+
 def store_distribution(distribution, vectorizer, name, output):
         output = os.path.join(ROOT, output)
         ensure_directory(output)
@@ -51,6 +61,7 @@ def main():
     definition = load_definition()
     sources = load_sources(definition)
     combinations = itertools.product(sources, definition.distributions)
+    cos = definition.placements[0]
     for (vectorizer, data), distribution in combinations:
         name = type(distribution).__name__
         print('Fit {} with {}'.format(vectorizer, name))
@@ -61,6 +72,14 @@ def main():
         print('(For mean higher is better, for std lower is better)')
         distribution.fit(data)
         store_distribution(distribution, vectorizer, name, definition.output)
+
+        # also fit cosim
+        name = type(cos).__name__
+        print('Fit {} with {}'.format(vectorizer, name))
+        folds = definition.folds
+        sum_of_squares = np.array(list(embedding(cos, data, folds)))
+        message = 'Sum of squared errors mean {} std {} on test data'
+        print(message.format(sum_of_squares.mean(), sum_of_squares.std()))
 
 
 if __name__ == '__main__':

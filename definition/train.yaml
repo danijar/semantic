@@ -10,6 +10,9 @@ distributions:
     covariance_type: full
     # n_iter: 500
     # verbose: 1
-  # - type: MultinomialNB
-  #   percentile_threshold: 0
-  #   bins: 2
+  - type: MultinomialNB
+    percentile_threshold: 0
+    bins: 5
+placements:
+  - type: CoSim
+    n_nearest: 10
