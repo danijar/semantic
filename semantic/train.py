@@ -23,19 +23,20 @@ def load_sources(definition):
         print('Load vectorizer', filepath)
         with open(os.path.join(ROOT, filepath), 'rb') as file_:
             vectorizer = pickle.load(file_)
+        print('Transform user corpus')
         _, data = vectorizer.transform(definition.data)
         name = '.'.join(os.path.basename(filepath).split('.')[:-1])
         yield name, data
 
 
-def training(definition, distribution, data):
+def training(distribution, data, folds):
     folds = KFold(
-        data.shape[0], n_folds=definition.folds, shuffle=True, random_state=0)
+        data.shape[0], n_folds=folds, shuffle=True, random_state=0)
     for train, test in folds:
         train, test = data[train], data[test]
         distribution.fit(train)
         log_density = distribution.transform(test)
-        yield -np.log(np.clip(log_density, 1e-10, 1)).mean()
+        yield np.log(np.max(log_density, 1e-10)).mean()
 
 
 def store_distribution(distribution, vectorizer, name, output):
@@ -53,7 +54,8 @@ def main():
     for (vectorizer, data), distribution in combinations:
         name = type(distribution).__name__
         print('Fit {} with {}'.format(vectorizer, name))
-        log_densities = np.array(list(training(definition, distribution, data)))
+        folds = definition.folds
+        log_densities = np.array(list(training(distribution, data, folds)))
         message = 'Log density mean {} std {} on test data'
         print(message.format(log_densities.mean(), log_densities.std()))
         print('(For mean higher is better, for std lower is better)')
