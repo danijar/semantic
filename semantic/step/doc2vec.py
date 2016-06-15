@@ -17,7 +17,7 @@ class Doc2Vec(Step):
         # self._model.scale_vocab()
         # self._model.finalize_vocab()
         self._model.train(self._read(filename))
-        print('Doc2Vec log accuracy', self._model.log_accuracy())
+        # FIXME: print('Doc2Vec log accuracy', self._model.log_accuracy())
         _, vectors = self.transform(filename)
         self._ica.fit(vectors)
 

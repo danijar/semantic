@@ -4,6 +4,6 @@ output: data/experiment-1
 folds: 10
 distributions:
 - type: GMM
-- type: Multinomial
+- type: MultinomialNB
   percentile_threshold: 1
-  bins: 100
+  bins: 10
