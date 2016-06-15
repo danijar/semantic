@@ -1,6 +1,6 @@
 import numpy as np
 import gensim
-from sklearn.decomposition import FastICA
+from sklearn.decomposition import PCA
 from gensim.models.doc2vec import TaggedDocument
 from semantic.parser import Reader
 from semantic.step import Step
@@ -8,19 +8,19 @@ from semantic.step import Step
 
 class Doc2Vec(Step):
 
-    def __init__(self, ica=None, **kwargs):
+    def __init__(self, pca=None, **kwargs):
         self._model = gensim.models.Doc2Vec(**kwargs)
-        self._ica = FastICA(**(ica or {}))
+        self._pca = PCA(**(pca or {}))
 
     def fit(self, filename):
         self._model.build_vocab(self._read(filename))
         self._model.train(self._read(filename))
         _, vectors = self._transform(filename)
-        self._ica.fit(vectors)
+        self._pca.fit(vectors)
 
     def transform(self, filename):
         uuids, vectors = self._transform(filename)
-        vectors = self._ica.transform(vectors)
+        vectors = self._pca.transform(vectors)
         return uuids, vectors
 
     def _transform(self, filename):

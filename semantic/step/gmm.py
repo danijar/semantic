@@ -1,5 +1,5 @@
 from sklearn.mixture import GMM as SkGMM
-from numpy import exp
+import numpy as np
 
 from semantic.step import Step
 
@@ -13,4 +13,4 @@ class GMM(Step):
         self.gmm.fit(vectors)
 
     def transform(self, vectors):
-        return exp(self.gmm.score(vectors))
+        return np.max(self.gmm.predict_proba(vectors), axis=1)

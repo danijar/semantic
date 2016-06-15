@@ -2,10 +2,10 @@ output: data/experiment-1
 vectorizers:
 - type: Doc2Vec
   size: 500
-  iter: 1  # 5
-  workers: 4
+  iter: 20
+  workers: 8
   negative: 30
-  ica:
+  pca:
     n_components: 100
 - type: TfIdf
   stop_words: english
