@@ -1,4 +1,4 @@
-output: data/experiment-test
+output: data/experiment-1
 vectorizers:
 - type: Doc2Vec
   size: 500

@@ -1,8 +1,8 @@
 output: data/experiment-1
 data: data/hendrik.csv
 vectorizers:
-  - data/experiment-test/tfidf.pkl
-  - data/experiment-test/doc2vec.pkl
+  - data/experiment-1/tfidf.pkl
+  - data/experiment-1/doc2vec.pkl
 folds: 5
 distributions:
   - type: GMM
