@@ -4,7 +4,7 @@ import csv
 
 class Reader:
 
-    TOKEN_REGEX = re.compile(r'[A-Za-z]+|[0-9]+|[,.!?:]')
+    TOKEN_REGEX = re.compile(r'[A-Za-z]+')
 
     def __init__(self, filename):
         self._filename = filename
