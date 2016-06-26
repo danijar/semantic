@@ -8,7 +8,7 @@ vectorizers:
   pca:
     n_components: 100
 - type: TfIdf
-  stop_words: english
+  # stop_words: english
   min_df: 10
   max_df: 0.3
   svd:
