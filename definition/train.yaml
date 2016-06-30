@@ -1,15 +1,11 @@
-output: data/experiment-2
-data: data/hendrik.csv
-vectorizers:
-  - data/experiment-1/tfidf.pkl
-  - data/experiment-1/doc2vec.pkl
+directory: data/experiment-1
+uuids: uuids.npy
+embeddings:
+  - tfidf.npy
+  - doc2vec.npy
+users: data/users.txt
 folds: 10
 distributions:
   - type: GMM
-    n_components: 20
-    covariance_type: full
-  - type: MultinomialAVG
-    percentile_threshold: 0
-    bins: 20
-  - type: NearestNeighbors
-    neighbors: 10
+    n_components: 3
+    # covariance_type: full

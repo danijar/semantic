@@ -11,5 +11,4 @@ class GMM(Step):
         self._model.fit(vectors)
 
     def transform(self, vectors):
-        log_density = self._model.score(vectors)
-        return -log_density
+        return self._model.score(vectors)

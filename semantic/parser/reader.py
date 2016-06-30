@@ -11,15 +11,16 @@ class Reader:
 
     def __iter__(self):
         with open(self._filename, 'r') as f:
-            reader = csv.reader(f, delimiter=',')
+            reader = csv.DictReader(f, delimiter=',')
             next(reader)
             for article in reader:
-                title, url, content, authors, image, error, uuid = article
-                tokens = self._tokenize(content)
+                uuid = article['bookmarkID']
+                tokens = self._tokenize(article['content'])
                 try:
                     assert uuid and len(uuid) > 0
-                    assert len(tokens) >= 300
+                    assert tokens
                 except AssertionError:
+                    print('Skip invalid article')
                     continue
                 yield uuid, tokens
 

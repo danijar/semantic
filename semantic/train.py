@@ -14,49 +14,78 @@ def load_definition():
     schema = os.path.join(ROOT, 'schema/train.yaml')
     definition = os.path.join(ROOT, 'definition/train.yaml')
     definition = definitions.Parser(schema)(definition)
-    definition.data = os.path.join(ROOT, definition.data)
+    definition.directory = os.path.join(ROOT, definition.directory)
+    ensure_directory(definition.directory)
     return definition
 
 
-def load_sources(definition):
-    for filepath in definition.vectorizers:
-        print('Load vectorizer', filepath)
-        with open(os.path.join(ROOT, filepath), 'rb') as file_:
-            vectorizer = pickle.load(file_)
-        print('Transform user corpus')
-        _, data = vectorizer.transform(definition.data)
-        name = '.'.join(os.path.basename(filepath).split('.')[:-1])
-        yield name, data
+def load_users(definition):
+    filepath = os.path.join(ROOT, definition.users)
+    with open(filepath) as file_:
+        for line in file_:
+            words = line.strip().split()
+            user_id = words[0]
+            uuids = words[1:]
+            yield user_id, uuids
+
+
+def collect_articles(definition, embedding, uuids):
+    corpus = np.load(os.path.join(definition.directory, definition.uuids))
+    indices = [np.argmax(corpus == x) for x in uuids]
+    return embedding[indices]
+
+
+def load_embeddings(definition):
+    for filename in definition.embeddings:
+        print('Load embedding', filename)
+        filepath = os.path.join(ROOT, definition.directory, filename)
+        with open(filepath, 'rb') as file_:
+            embedding = np.load(file_)
+        name, _ = os.path.splitext(filename)
+        yield name, embedding
 
 
 def training(distribution, data, folds):
+    """Return a list of log probs for each document."""
     folds = KFold(data.shape[0], n_folds=folds, shuffle=True, random_state=0)
     for train, test in folds:
         train, test = data[train], data[test]
         distribution.fit(train)
-        yield distribution.transform(test).mean()
+        yield distribution.transform(test)
 
 
-def store_distribution(distribution, vectorizer, name, output):
-        output = os.path.join(ROOT, output)
-        ensure_directory(output)
-        filename = '{}-{}.pkl'.format(vectorizer.lower(), name.lower())
-        with open(os.path.join(output, filename), 'wb') as file_:
+def evaluation(definition, distribution, embedding, name):
+    costs = []
+    for user_id, uuids in load_users(definition):
+        data = collect_articles(definition, embedding, uuids)
+        costs += list(training(distribution, data, definition.folds))
+    cost = np.concatenate(costs)
+    prob = np.exp(cost).mean()
+    message = '{} mean {:6.2f} std {:6.4f} prob {:6.5}'
+    print(message.format(name, cost.mean(), cost.std(), prob))
+
+
+def store_distribution(definition, distribution, embedding, name):
+    directory = os.path.join(definition.directory, 'users')
+    ensure_directory(directory)
+    for user_id, uuids in load_users(definition):
+        data = collect_articles(definition, embedding, uuids)
+        distribution.fit(data)
+        filename = '{}-{}.pkl'.format(name, user_id)
+        filepath = os.path.join(directory, filename)
+        with open(filepath, 'wb') as file_:
             pickle.dump(distribution, file_)
 
 
 def main():
     definition = load_definition()
-    sources = load_sources(definition)
-    combinations = itertools.product(sources, definition.distributions)
-    for (vectorizer, data), distribution in combinations:
-        name = type(distribution).__name__
-        print('Fit {} with {}'.format(vectorizer, name))
-        cost = np.array(list(training(distribution, data, definition.folds)))
-        message = 'Cost on test mean {:6.2f} std {:6.4f}'
-        print(message.format(cost.mean(), cost.std()))
-        distribution.fit(data)
-        store_distribution(distribution, vectorizer, name, definition.output)
+    embeddings = load_embeddings(definition)
+    combinations = itertools.product(embeddings, definition.distributions)
+    for (emb_name, embedding), distribution in combinations:
+        dist_name = type(distribution).__name__
+        name = '{}-{}'.format(emb_name, dist_name)
+        evaluation(definition, distribution, embedding, name)
+        store_distribution(definition, distribution, embedding, name)
 
 
 if __name__ == '__main__':

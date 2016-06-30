@@ -32,8 +32,12 @@ def store(vectorizer, corpus, output):
     with open(os.path.join(output, '{}.pkl'.format(name)), 'wb') as file_:
         pickle.dump(vectorizer, file_)
     uuids, data = vectorizer.transform(corpus)
-    np.save(os.path.join(output, 'uuids.npy'), uuids)
-    np.save(os.path.join(output, 'data.npy'), data)
+    uuids_path = os.path.join(output, 'uuids.npy')
+    if os.path.isfile(uuids_path):
+        assert (np.load(uuids_path) == uuids).all()
+    else:
+        np.save(os.path.join(output, 'uuids.npy'), uuids)
+    np.save(os.path.join(output, name + '.npy'), data)
 
 
 def main():

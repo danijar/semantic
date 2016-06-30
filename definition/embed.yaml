@@ -2,15 +2,14 @@ corpus: data/corpus.csv
 output: data/experiment-1
 vectorizers:
 - type: Doc2Vec
-  size: 200  # 500
-  iter: 1  # 10
+  size: 300
+  iter: 10
   workers: 4
   negative: 30
   pca:
-    n_components: 100
+    n_components: 50
 - type: TfIdf
-  # stop_words: english
   min_df: 10
   max_df: 0.3
   svd:
-    n_components: 100
+    n_components: 50

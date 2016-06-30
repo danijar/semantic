@@ -1,21 +1,18 @@
 type: dict
 mapping:
-  data:
+  directory:
     type: str
-  vectorizers:
+  uuids:
+    type: str
+  embeddings:
     type: list
     elements:
       type: str
-  output:
+  users:
     type: str
   folds:
     type: int
   distributions:
-    type: list
-    elements:
-      type: Step
-      module: semantic.step
-  placements:
     type: list
     elements:
       type: Step
