@@ -1,5 +1,7 @@
 type: dict
 mapping:
+  corpus:
+    type: str
   output:
     type: str
   vectorizers:
@@ -7,9 +9,3 @@ mapping:
     elements:
       type: Step
       module: semantic.step
-  fit:
-    filename:
-      type: str
-  transform:
-    filename:
-      type: str

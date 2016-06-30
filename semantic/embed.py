@@ -13,34 +13,34 @@ def load_definition():
     schema = os.path.join(ROOT, 'schema/embed.yaml')
     definition = os.path.join(ROOT, 'definition/embed.yaml')
     definition = definitions.Parser(schema)(definition)
-    definition.fit.filename = os.path.join(ROOT, definition.fit.filename)
+    definition.corpus = os.path.join(ROOT, definition.corpus)
     return definition
 
 
-def fitting(vectorizer, **kwargs):
+def fitting(vectorizer, corpus):
     print('Fit', type(vectorizer).__name__)
     start = time.time()
-    vectorizer.fit(**kwargs)
+    vectorizer.fit(corpus)
     duration = int((time.time() - start) / 60)
     print('Took {} minutes'.format(duration))
 
 
-def store(vectorizer, output, **kwargs):
+def store(vectorizer, corpus, output):
     output = os.path.join(ROOT, output)
     ensure_directory(output)
     name = type(vectorizer).__name__.lower()
     with open(os.path.join(output, '{}.pkl'.format(name)), 'wb') as file_:
         pickle.dump(vectorizer, file_)
-    uuids, data = vectorizer.transform(**kwargs)
-    np.save(os.path.join(output, '{}-uuids.npy'.format(name)), uuids)
-    np.save(os.path.join(output, '{}-data.npy'.format(name)), data)
+    uuids, data = vectorizer.transform(corpus)
+    np.save(os.path.join(output, 'uuids.npy'), uuids)
+    np.save(os.path.join(output, 'data.npy'), data)
 
 
 def main():
     definition = load_definition()
     for vectorizer in definition.vectorizers:
-        fitting(vectorizer, **definition.fit)
-        store(vectorizer, definition.output, **definition.transform)
+        fitting(vectorizer, definition.corpus)
+        store(vectorizer, definition.corpus, definition.output)
 
 
 if __name__ == '__main__':

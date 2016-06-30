@@ -1,9 +1,10 @@
+corpus: data/corpus.csv
 output: data/experiment-1
 vectorizers:
 - type: Doc2Vec
-  size: 500
-  iter: 10
-  workers: 8
+  size: 200  # 500
+  iter: 1  # 10
+  workers: 4
   negative: 30
   pca:
     n_components: 100
@@ -13,7 +14,3 @@ vectorizers:
   max_df: 0.3
   svd:
     n_components: 100
-fit:
-  filename: data/corpus.csv
-transform:
-  filename: data/corpus.csv
