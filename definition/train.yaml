@@ -8,4 +8,3 @@ folds: 5
 distributions:
   - type: GMM
     n_components: 5
-    # covariance_type: full

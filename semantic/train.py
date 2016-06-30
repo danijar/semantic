@@ -35,6 +35,13 @@ def collect_articles(definition, embedding, uuids):
     return embedding[indices]
 
 
+def collect_remaining_articles(definition, embedding, uuids):
+    corpus = np.load(os.path.join(definition.directory, definition.uuids))
+    indices = [np.argmax(corpus == x) for x in uuids]
+    neg_indices = list(set(range(len(uuids))) - set(indices))
+    return embedding[neg_indices]
+
+
 def load_embeddings(definition):
     for filename in definition.embeddings:
         print('Load embedding', filename)
@@ -45,24 +52,29 @@ def load_embeddings(definition):
         yield name, embedding
 
 
-def training(distribution, data, folds):
+def training(distribution, positives, negatives, folds):
     """Return a list of log probs for each document."""
-    folds = KFold(data.shape[0], n_folds=folds, shuffle=True, random_state=0)
+    folds = KFold(
+        positives.shape[0], n_folds=folds, shuffle=True, random_state=0)
     for train, test in folds:
-        train, test = data[train], data[test]
+        train, test = positives[train], positives[test]
         distribution.fit(train)
-        yield distribution.transform(test)
+        densities = distribution.transform(test)
+        yield from [-x for x in densities]
+        densities = distribution.transform(negatives)
+        yield from [-np.log(1 - np.exp(x)) for x in densities]
 
 
 def evaluation(definition, distribution, embedding, name):
     costs = []
     for user_id, uuids in load_users(definition):
-        data = collect_articles(definition, embedding, uuids)
-        costs += list(training(distribution, data, definition.folds))
-    cost = np.concatenate(costs)
-    prob = np.exp(cost).mean()
-    message = '{} mean {:6.2f} std {:6.4f} prob {:6.5}'
-    print(message.format(name, cost.mean(), cost.std(), prob))
+        positives = collect_articles(definition, embedding, uuids)
+        negatives = collect_remaining_articles(definition, embedding, uuids)
+        costs += list(training(
+            distribution, positives, negatives, definition.folds))
+    cost = np.array(costs)
+    message = '{:<12} mean {:6.2f} median {:6.2f} std {:6.4f}'
+    print(message.format(name, cost.mean(), np.median(cost), cost.std()))
 
 
 def store_distribution(definition, distribution, embedding, name):
