@@ -52,29 +52,42 @@ def load_embeddings(definition):
         yield name, embedding
 
 
-def training(distribution, positives, negatives, folds):
+def nearest_neighbor(samples, embedding):
+    nearest = np.empty(samples.shape)
+    for index, sample in enumerate(samples):
+        distances = ((embedding - sample) ** 2).sum(axis=1)
+        closest = np.argmin(distances, axis=0)
+        nearest[index] = embedding[closest]
+    assert len(nearest) == len(samples)
+    return nearest
+
+
+def training(distribution, positives, embedding, folds, oversample=10):
     """Return a list of log probs for each document."""
     folds = KFold(
         positives.shape[0], n_folds=folds, shuffle=True, random_state=0)
     for train, test in folds:
         train, test = positives[train], positives[test]
         distribution.fit(train)
-        densities = distribution.transform(test)
-        yield from [-x for x in densities]
-        densities = distribution.transform(negatives)
-        yield from [-np.log(1 - np.exp(x)) for x in densities]
+        samples = distribution._model.sample(oversample * len(test), 42)
+        samples = nearest_neighbor(samples, embedding)
+        combined = np.concatenate([test, samples], axis=0)
+        hits = len(combined) - len({tuple(x) for x in combined.tolist()})
+        yield hits, len(test)
 
 
 def evaluation(definition, distribution, embedding, name):
-    costs = []
+    hits, amount = 0, 0
     for user_id, uuids in load_users(definition):
         positives = collect_articles(definition, embedding, uuids)
-        negatives = collect_remaining_articles(definition, embedding, uuids)
-        costs += list(training(
-            distribution, positives, negatives, definition.folds))
-    cost = np.array(costs)
-    message = '{:<12} mean {:6.2f} median {:6.2f} std {:6.4f}'
-    print(message.format(name, cost.mean(), np.median(cost), cost.std()))
+        runs = training(distribution, positives, embedding, definition.folds)
+        for h, a in runs:
+            hits += h
+            amount += a
+    message = '{:<12} error {:6.2f}% after 10x sampling'
+    print(hits, amount)
+    error = 1 - (hits / amount)
+    print(message.format(name, 100 * error))
 
 
 def store_distribution(definition, distribution, embedding, name):
