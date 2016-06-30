@@ -4,6 +4,7 @@ import definitions
 from definitions.attrdict import AttrDict
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 from sklearn.decomposition import KernelPCA
 from sklearn.manifold import TSNE
 from semantic.utility import ensure_directory
@@ -19,50 +20,43 @@ def load_definition():
     definition.output = os.path.join(ROOT, definition.output)
     for index, source in enumerate(definition.sources):
         source = AttrDict(source)
-        source.filename = os.path.join(ROOT, source.filename)
+        source.uuids = os.path.join(ROOT, source.uuids)
         definition.sources[index] = source
     return definition
 
 
-def load_data(definition):
-    with open(os.path.join(ROOT, definition.vectorizer), 'rb') as file_:
-        vectorizer = pickle.load(file_)
-    data, colors = [], []
-    for source in definition.sources:
-        _, vectors = vectorizer.transform(source.filename)
-        data.append(vectors)
-        colors.append(source.color)
-    return data, colors
+def collect_articles(definition, embedding, uuids):
+    corpus = np.load(os.path.join(definition.directory, definition.uuids))
+    indices = [np.argmax(corpus == x) for x in uuids]
+    return embedding[indices]
 
 
-def plot_vectors(data, labels, colors, output):
+def plot_vectors(data, uuids, sources, output):
     fig, ax = plt.subplots(figsize=(12, 8))
-    for points, label, color in zip(data, labels, colors):
-        ax.scatter(points[:, 0], points[:, 1], label=label, c=color)
-    ax.legend(loc='upper right')
-    ensure_directory(output)
-    filename = os.path.join(output, 'figure.png')
-    fig.savefig(filename, dpi=300)
+    handles = []
+    colors = {x: 'gray' for x in uuids}
+    for source in sources:
+        for uuid in open(source.uuids).read().split():
+            colors[uuid] = source.color
+        handles.append(mpatches.Patch(color=source.color, label=source.label))
+    colors = [colors[x] for x in uuids]
+    ax.scatter(data[:, 0], data[:, 1], c=colors)
+    plt.legend(handles=handles, loc='upper right')
+    ensure_directory(os.path.dirname(output))
+    fig.savefig(output, dpi=300)
 
 
 def main():
     definition = load_definition()
-    data, colors = load_data(definition)
-    lengths = [len(x) for x in data]
+    data = np.load(os.path.join(ROOT, definition.embedding))
+    uuids = np.load(os.path.join(ROOT, definition.uuids))
 
     pca = KernelPCA(**definition.pca)
     tsne = TSNE(**definition.tsne)
-    combined = np.concatenate(data, axis=0)
-    combined = pca.fit_transform(combined)
-    combined = tsne.fit_transform(combined)
+    data = pca.fit_transform(data)
+    data = tsne.fit_transform(data)
 
-    data = []
-    for index, length in enumerate(lengths):
-        index = sum(lengths[:index])
-        data.append(combined[index: index + length])
-    labels = [os.path.basename(x.filename).split('.')[0]
-              for x in definition.sources]
-    plot_vectors(data, labels, colors, definition.output)
+    plot_vectors(data, uuids, definition.sources, definition.output)
 
 
 if __name__ == '__main__':
