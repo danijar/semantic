@@ -13,20 +13,23 @@ class LDA(Step):
         self._n_topics = num_topics
 
     def fit(self, filename):
-        contents = [' '.join(x) for _, x in Reader(filename)]
+        contents = [x for _, x in Reader(filename)]
         self._dictionary = Dictionary(contents)
-        self._model = LdaModel(self._dictionary, num_topics=self._n_topics)
+        corpus = [self._dictionary.doc2bow(text) for text in contents]
+        self._model = LdaModel(corpus, num_topics=self._n_topics)
 
     def transform(self, filename):
-        vectors = self._transform(filename)
-        return vectors
+        uuids, vectors = self._transform(filename)
+        return uuids, vectors
 
     def _transform(self, filename):
         vectors = []
-        for _, tokens in Reader(filename):
-            bow = self._dictionary[tokens]
+        uuids = []
+        for uuid, tokens in Reader(filename):
+            bow = self._dictionary.doc2bow(tokens)
             vectors.append(self._model[bow])
-        return np.array(vectors)
+            uuids.append(uuid)
+        return uuids, np.array(vectors)
 
     @classmethod
     def _read(cls, filename):
