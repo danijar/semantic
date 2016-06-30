@@ -1,17 +1,21 @@
 type: dict
 mapping:
+  embedding:
+    type: str
+  uuids:
+    type: str
   sources:
     type: list
     elements:
       type: dict
       mapping:
-        filename:
+        label:
           type: str
         color:
           type: str
+        uuids:
+          type: str
   output:
-    type: str
-  vectorizer:
     type: str
   pca:
     type: dict

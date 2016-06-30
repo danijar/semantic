@@ -1,12 +1,15 @@
+embedding: data/experiment-2/doc2vec.npy
+uuids: data/experiment-2/uuids.npy
 sources:
-- filename: data/hendrik-pocket.csv
-  color: red
-- filename: data/fabian-pocket.csv
-  color: green
-output: data/experiment-1
-vectorizer: data/experiment-1/tfidf/vectorizer.pkl
+  - label: Topics One
+    color: red
+    uuids: data/topic1.txt
+  - label: Topic Two
+    color: green
+    uuids: data/topic2.txt
+output: data/experiment-2/topics.png
 pca:
-  n_components: 50
+  n_components: 25
   kernel: rbf
 tsne:
   n_components: 2
