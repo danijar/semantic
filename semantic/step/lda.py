@@ -27,7 +27,9 @@ class LDA(Step):
         uuids = []
         for uuid, tokens in Reader(filename):
             bow = self._dictionary.doc2bow(tokens)
-            vectors.append(self._model[bow])
+            lda_probs = {dim: prob for dim, prob in self._model[bow]}
+            lda_vec = [lda_probs.get(i, 0) for i in range(self._n_topics)]
+            vectors.append(lda_vec)
             uuids.append(uuid)
         return uuids, np.array(vectors)
 
