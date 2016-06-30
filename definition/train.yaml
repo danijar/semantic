@@ -1,11 +1,11 @@
-directory: data/experiment-1
+directory: data/experiment-2
 uuids: uuids.npy
 embeddings:
   - tfidf.npy
   - doc2vec.npy
 users: data/users.txt
-folds: 10
+folds: 5
 distributions:
   - type: GMM
-    n_components: 3
+    n_components: 5
     # covariance_type: full

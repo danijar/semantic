@@ -1,15 +1,17 @@
 corpus: data/corpus.csv
-output: data/experiment-1
+output: data/experiment-2
 vectorizers:
-- type: Doc2Vec
-  size: 300
-  iter: 10
-  workers: 4
-  negative: 30
-  pca:
-    n_components: 50
-- type: TfIdf
-  min_df: 10
-  max_df: 0.3
-  svd:
-    n_components: 50
+  - type: Doc2Vec
+    size: 300
+    iter: 10
+    workers: 4
+    negative: 30
+    pca:
+      n_components: 100
+  - type: TfIdf
+    min_df: 10
+    max_df: 0.3
+    svd:
+      n_components: 100
+  - type: LDA
+    num_topics: 100
