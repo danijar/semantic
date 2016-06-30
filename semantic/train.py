@@ -62,12 +62,14 @@ def nearest_neighbor(samples, embedding):
     return nearest
 
 
-def training(distribution, positives, embedding, folds, oversample=10):
+def training(distribution, positives, embedding, folds, oversample=1):
     """Return a list of log probs for each document."""
     folds = KFold(
         positives.shape[0], n_folds=folds, shuffle=True, random_state=0)
     for train, test in folds:
         train, test = positives[train], positives[test]
+        # embedding = embedding[np.random.choice(np.arange(len(embedding)), len(test))]
+        embedding = embedding[np.random.choice(np.arange(len(embedding)), 500)]
         distribution.fit(train)
         samples = distribution._model.sample(oversample * len(test), 42)
         samples = nearest_neighbor(samples, embedding)
@@ -84,10 +86,10 @@ def evaluation(definition, distribution, embedding, name):
         for h, a in runs:
             hits += h
             amount += a
-    message = '{:<12} error {:6.2f}% after 10x sampling'
+    message = '{:<12} hits {} overall {} error {:6.2f}%'
     print(hits, amount)
     error = 1 - (hits / amount)
-    print(message.format(name, 100 * error))
+    print(message.format(name, hits, amount, 100 * error))
 
 
 def store_distribution(definition, distribution, embedding, name):
